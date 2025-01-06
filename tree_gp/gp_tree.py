@@ -10,18 +10,11 @@ class GPTree:
         return GPTree(self.root.copy())
 
     def evaluate(self, variables):
-        """
-        Non-vectorized evaluation of a single sample.
-        variables: array/list of feature values
-        """
+        """Evaluate for one sample (non-vectorized)."""
         return self.root.evaluate(variables)
 
     def evaluate_vectorized(self, X):
-        """
-        Vectorized evaluation for all samples in X.
-        X: shape (n_features, n_samples)
-        Returns: array of shape (n_samples,) with predictions.
-        """
+        """Vectorized evaluation for all samples in X."""
         return self.root.evaluate_vectorized(X)
 
     @staticmethod
@@ -30,8 +23,7 @@ class GPTree:
         if depth >= max_depth:
             return GPTree._random_terminal(variables_count)
 
-        # Decide whether to create operator or terminal
-        # 70% chance to choose an operator if not full method
+        # 70% chance to choose operator if not full method
         if (full and depth < max_depth) or (not full and random.random() < 0.7):
             op, arity = operators.random_operator()
             children = []
@@ -46,7 +38,7 @@ class GPTree:
 
     @staticmethod
     def _random_terminal(variables_count):
-        # 50% chance for variable, 50% for constant
+        # 50% variable, 50% constant
         if random.random() < 0.5:
             var_index = random.randint(0, variables_count - 1)
             node = Node(f'x_{var_index}', 0, [])

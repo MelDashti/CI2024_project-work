@@ -6,41 +6,41 @@ from population import (
     mutate, 
     crossover
 )
-from config import (POPULATION_SIZE, ELITISM_COUNT, MAX_GENERATIONS)
+from config import (
+    POPULATION_SIZE, ELITISM_COUNT, MAX_GENERATIONS,
+    PATIENCE, MIN_FITNESS_IMPROVEMENT
+)
 
 def run_evolution(X, y, variables_count):
-    """
-    Main evolutionary loop.
-    Returns the best individual found across generations.
-    """
-    # Initialize
     population = initialize_population(variables_count)
     best_individual = None
     best_fitness = float('inf')
 
-    for gen in range(MAX_GENERATIONS):
-        # Evaluate
-        scored_population = evaluate_population(population, X, y)
-        scored_population.sort(key=lambda x: x[1])  # sort by fitness
+    patience_counter = 0
+    previous_best = best_fitness
 
-        # Elitism: carry over top performers
+    for gen in range(MAX_GENERATIONS):
+        scored_population = evaluate_population(population, X, y)
+        scored_population.sort(key=lambda x: x[1])
+
         next_generation = [ind[0] for ind in scored_population[:ELITISM_COUNT]]
 
-        # Track best individual
-        if scored_population[0][1] < best_fitness:
-            best_fitness = scored_population[0][1]
-            best_individual = scored_population[0][0].copy()
+        current_best_fitness = scored_population[0][1]
+        current_best_individual = scored_population[0][0].copy()
 
-        # Generate new population
+        if (previous_best - current_best_fitness) > MIN_FITNESS_IMPROVEMENT:
+            best_fitness = current_best_fitness
+            best_individual = current_best_individual
+            patience_counter = 0
+            previous_best = best_fitness
+        else:
+            patience_counter += 1
+
         while len(next_generation) < POPULATION_SIZE:
-            # Selection
             parent1 = tournament_selection(scored_population)
             parent2 = tournament_selection(scored_population)
 
-            # Crossover
             child1, child2 = crossover(parent1, parent2)
-
-            # Mutation
             child1 = mutate(child1, variables_count)
             child2 = mutate(child2, variables_count)
 
@@ -49,7 +49,10 @@ def run_evolution(X, y, variables_count):
                 next_generation.append(child2)
 
         population = next_generation
-        
         print(f"Generation {gen}: Best fitness = {best_fitness}")
+
+        if patience_counter >= PATIENCE:
+            print(f"Early stopping at generation {gen} due to no improvement.")
+            break
 
     return best_individual, best_fitness
