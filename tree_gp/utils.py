@@ -2,10 +2,20 @@ import numpy as np
 import sympy
 from sympy import Symbol, sympify
 
-def load_dataset(filepath="data/problem_0.npz", test_split=0.2):
+def load_dataset(filepath, test_split=0.2):
     data = np.load(filepath)
     x = data['x']  # shape (n_features, n_samples)
     y = data['y']  # shape (n_samples,)
+
+    # # Normalize features along each row (feature)
+    # x_mean = np.mean(x, axis=1, keepdims=True)
+    # x_std = np.std(x, axis=1, keepdims=True) + 1e-10  # avoid div by zero
+    # x = (x - x_mean) / x_std
+
+    # # Optionally, normalize targets if the scale is very large:
+    # y_mean = np.mean(y)
+    # y_std = np.std(y) + 1e-10
+    # y = (y - y_mean) / y_std
 
     n_samples = y.shape[0]
     n_test = int(n_samples * test_split)
@@ -23,26 +33,26 @@ def mean_squared_error(gp_tree, X, y):
 def calculate_mse(predictions, true_values):
     return 100 * np.square(predictions - true_values).sum() / len(true_values)
 
-# -----------------------------------------------------
-# Symbolic simplification for the final expression
-# -----------------------------------------------------
+
+# In utils.py
+
+import sympy
+from sympy import Symbol, sympify
 
 def tree_to_sympy(node):
     """
     Recursively convert a GP Node into a Sympy expression.
-    Handles unary and binary operators robustly, ensuring all supported
-    operators are mapped to their Sympy equivalents.
+    Handles unary and binary operators robustly.
     """
     if node.is_leaf():
         if isinstance(node.value, str) and node.value.startswith("x_"):
-            # Variable
             idx = int(node.value.split("_")[1])
-            return Symbol(f'x{idx}', real=True)  # e.g., x0, x1, ...
+            return Symbol(f'x{idx}', real=True)
         else:
-            # Constant
-            return sympy.Float(node.value)
+            # Use sympify to try and convert numbers or strings to sympy types.
+            return sympify(node.value)
     else:
-        # Operator node
+        # Updated operator dictionaries with 'cube' and 'square'
         unary_ops = {
             'sin': sympy.sin,
             'cos': sympy.cos,
@@ -51,21 +61,15 @@ def tree_to_sympy(node):
             'exp': sympy.exp,
             'sqrt': sympy.sqrt,
             'negate': lambda x: -x,
-            'square': lambda x: x**2,
             'cube': lambda x: x**3,
-            'asin': sympy.asin,
-            'acos': sympy.acos,
-            'atan': sympy.atan,
+            'square': lambda x: x**2,
         }
         binary_ops = {
             '+': lambda x, y: x + y,
             '-': lambda x, y: x - y,
             '*': lambda x, y: x * y,
             '/': lambda x, y: x / y,
-            'pow': lambda x, y: x**y,
-            'mod': lambda x, y: x % y,
         }
-
         if node.arity == 1:
             child_expr = tree_to_sympy(node.children[0])
             if node.value in unary_ops:
@@ -92,5 +96,5 @@ def simplify_tree(gp_tree):
         simplified_expr = sympy.simplify(expr)
     except Exception as e:
         print(f"Error during simplification: {e}")
-        simplified_expr = expr  # Fallback to the unsimplified expression
+        simplified_expr = expr  # fallback to unsimplified expression
     return str(simplified_expr)

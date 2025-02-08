@@ -9,7 +9,7 @@ from config import (
 )
 
 # Increase parsimony coefficient to further discourage bloated trees
-PARSIMONY_COEFF = 0.001  
+PARSIMONY_COEFF = 0.005  
 
 def initialize_population(variables_count):
     population = []

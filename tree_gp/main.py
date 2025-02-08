@@ -4,8 +4,8 @@ from node import Node
 from gp_tree import GPTree
 from utils import load_dataset, mean_squared_error, simplify_tree
 from evolution import run_evolution
-from visualize import visualize_tree
-from config import SEED, VISUALIZE_BEST_INDIVIDUALS, TRAIN_DATA_PATH
+from config import SEED, TRAIN_DATA_PATH
+np.seterr(all='ignore')
 
 def main():
     random.seed(SEED)
