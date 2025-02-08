@@ -1171,8 +1171,28 @@ One of the biggest findings was **how generation count affects MSE and formula c
 So after all that work tuning parameters on datasets 2 and 7 (which were pretty tough!), I tried running my GP system on the other datasets - and it actually worked really well! The cool thing was that most of the other datasets didn't need nearly as many generations to get good results.
 While datasets 2 and 7 needed to run for the full 180 generations to get good mse values, the others were finding good solutions way faster - usually somewhere between 20-50 generations. This was great because it meant:
 
-The formulas came out simpler and easier to read, everything ran faster. Also, the early stopping feature I added actually came in handy, stopping the run when it wasn't getting better anymore
+The formulas came out simpler and easier to read, everything ran faster. Also, the early stopping feature I added actually came in handy, stopping the run when it wasn't getting better anymore. However, since I started from complex dataset I was observing a new issue when testing the simpler dataset like 0 and 1 where for both I was getting the same value [x0] as the final formula we will in the next section more about this.
 
+## Additional Observations: Effect of Parsimony on Formula Complexity  
+
+While fine-tuning hyperparameters, I noticed that the GP system **kept converging to overly simple formulas** like `x[0]`, even when the true function contained additional terms like `sin(x[1]/5)`. Initially, I assumed this was due to operator selection or tree depth constraints, but after further testing, I found the real issue: **the parsimony coefficient**.
+
+#### **Parsimony and Its Impact**
+Parsimony is used to prevent bloated expressions by penalizing larger trees in the fitness function. However, **it unintentionally suppressed necessary complexity**, making the system favor simpler formulas like `x[0]`, even when slightly more complex ones fit the data much better.
+
+#### **Fix: Removing Parsimony Pressure**
+For **Datasets 0 and 1**, I set the **parsimony coefficient to 0**, completely removing the size penalty from the fitness function. This allowed the GP to evolve more expressive formulas without immediately discarding non-trivial structures.
+
+#### **Results After Removing Parsimony**
+With **parsimony disabled**, the GP system was finally able to evolve formulas closer to the expected function:
+
+
+After applying these refinements, the system finally evolved **accurate expressions** rather than defaulting to `x[0]`. The best formulas started to resemble:  
+
+f(x) = x[0] + \frac{\sin(x[1])}{5}
+and sin[x0]
+
+So based on different datasets I had to make different changes. Parsimony coefficient is needed for the more complex dataset in order to achieve a lower mse. 
 
 ## Lecture Notes: Early Class Highlights
 

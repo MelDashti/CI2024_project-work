@@ -4,7 +4,7 @@ import numpy as np
 def f0(x: np.ndarray) -> np.ndarray:
     return x[0] + np.sin(x[1] / 5)
 
-def f1(x: np.ndarray) -> np.ndarray: ...
+def f1(x: np.ndarray) -> np.ndarray: np.sin(x[0])
 
 
 def f2(x: np.ndarray) -> np.ndarray: ...

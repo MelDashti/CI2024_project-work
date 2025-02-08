@@ -21,13 +21,16 @@ def run_evolution(X, y, variables_count):
 
     for gen in range(MAX_GENERATIONS):
         scored_population = evaluate_population(population, X, y)
-        scored_population.sort(key=lambda x: x[1])
+        scored_population.sort(key=lambda x: x[1])  # sort by fitness
 
+        # Elitism
         next_generation = [ind[0] for ind in scored_population[:ELITISM_COUNT]]
 
+        # Track best in this generation
         current_best_fitness = scored_population[0][1]
         current_best_individual = scored_population[0][0].copy()
 
+        # Update global best
         if (previous_best - current_best_fitness) > MIN_FITNESS_IMPROVEMENT:
             best_fitness = current_best_fitness
             best_individual = current_best_individual
@@ -36,6 +39,7 @@ def run_evolution(X, y, variables_count):
         else:
             patience_counter += 1
 
+        # Fill the rest of next_generation
         while len(next_generation) < POPULATION_SIZE:
             parent1 = tournament_selection(scored_population)
             parent2 = tournament_selection(scored_population)
@@ -49,7 +53,8 @@ def run_evolution(X, y, variables_count):
                 next_generation.append(child2)
 
         population = next_generation
-        print(f"Generation {gen}: Best fitness = {best_fitness}")
+
+        print(f"Generation {gen}: Best fitness = {best_fitness:.6f}")
 
         if patience_counter >= PATIENCE:
             print(f"Early stopping at generation {gen} due to no improvement.")

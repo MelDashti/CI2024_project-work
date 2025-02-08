@@ -5,6 +5,7 @@ from gp_tree import GPTree
 from utils import load_dataset, mean_squared_error, simplify_tree
 from evolution import run_evolution
 from config import SEED, TRAIN_DATA_PATH
+
 np.seterr(all='ignore')
 
 def main():
@@ -21,7 +22,8 @@ def main():
     print("Training MSE:", best_fitness)
 
     # Evaluate on test set
-    test_mse = evaluate_on_test(best_individual, x_test, y_test)
+    preds_test = best_individual.evaluate_vectorized(x_test)
+    test_mse = np.mean((preds_test - y_test)**2)
     print("Test MSE:", test_mse)
 
     # Optionally, simplify final formula with Sympy
@@ -35,11 +37,6 @@ def main():
         pred = best_individual.evaluate(x_test[:, i])
         actual = y_test[i]
         print(f"Sample {i}: Predicted = {pred:.3f}, Actual = {actual:.3f}")
-
-
-def evaluate_on_test(gp_tree, X_test, y_test):
-    preds = gp_tree.evaluate_vectorized(X_test)
-    return np.mean((preds - y_test)**2)
 
 if __name__ == "__main__":
     main()
