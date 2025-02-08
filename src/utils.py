@@ -93,8 +93,52 @@ def simplify_tree(gp_tree):
     """
     expr = tree_to_sympy(gp_tree.root)
     try:
-        simplified_expr = sympy.simplify(expr)
+        # First clean up any problematic terms
+        if expr.has(sympy.zoo) or expr.has(sympy.oo) or expr.has(sympy.nan):
+            expr = expr.replace(sympy.zoo, 1e100)
+            expr = expr.replace(sympy.oo, 1e100)
+            expr = expr.replace(-sympy.oo, -1e100)
+            expr = expr.replace(sympy.nan, 0)
+
+        # Try different simplification strategies
+        results = []
+        
+        # Basic expansion
+        try:
+            results.append(sympy.expand(expr))
+        except:
+            pass
+            
+        # Try the default simplify
+        try:
+            results.append(sympy.simplify(expr))
+        except:
+            pass
+            
+        # Try collecting terms
+        try:
+            results.append(sympy.collect(expr, expr.free_symbols))
+        except:
+            pass
+            
+        # Try factoring
+        try:
+            results.append(sympy.factor(expr))
+        except:
+            pass
+        
+        # Choose the simplest valid result
+        valid_results = [r for r in results if r is not None]
+        if valid_results:
+            simplified_expr = min(valid_results, key=lambda x: x.count_ops())
+            # If the simplified result is too complex, return original
+            if simplified_expr.count_ops() > 2 * expr.count_ops():
+                return str(expr)
+            return str(simplified_expr)
+        
+        # If no simplification worked, return original
+        return str(expr)
+        
     except Exception as e:
         print(f"Error during simplification: {e}")
-        simplified_expr = expr  # fallback to unsimplified expression
-    return str(simplified_expr)
+        return str(expr)  # fallback to unsimplified expression
