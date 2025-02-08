@@ -113,6 +113,8 @@ Through extensive experimentation and tuning, I identified key performance chara
 - **Population Dynamics**: Population size of 300 provides sufficient genetic diversity
 - **Convergence**: Most datasets achieve good results within 20-50 generations
 - **Complex Cases**: Challenging datasets may require full 180 generations
+- **Parsimony and Formula Complexity**: Parsimony penalized large trees, **forcing overly simple formulas** like `x[0]`. Setting **parsimony to 0** for **Datasets 0 and 1** allowed the GP to evolve more expressive formulas while keeping it for complex datasets helped control bloat and improve MSE.
+
 
 ## 🚀 Getting Started
 
