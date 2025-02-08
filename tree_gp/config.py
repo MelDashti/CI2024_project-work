@@ -17,4 +17,4 @@ PATIENCE = 7  # Number of generations without improvement before stopping
 MIN_FITNESS_IMPROVEMENT = 1e-7  # Minimum improvement for it to count
 
 # Data
-TRAIN_DATA_PATH = "data/problem_2.npz"
+TRAIN_DATA_PATH = "data/problem_7.npz"

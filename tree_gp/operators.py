@@ -3,8 +3,8 @@ import numpy as np
 import random
 
 def safe_log(x):
-    # Clip x to avoid log(0) or negative values.
-    return np.log(np.clip(x, 1e-10, None))
+    return np.log(np.clip(x, 1e-5, None))  # Clip values lower than 1e-5
+
 
 def safe_exp(x):
     # Clip x to avoid overflow.
