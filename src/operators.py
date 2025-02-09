@@ -39,7 +39,7 @@ BINARY_OPERATORS = {
 }
 
 def random_operator():
-    # 60% chance to pick a binary operator, 40% chance for a unary.
+    # 80% chance to pick a binary operator, 20% chance for a unary.
     if random.random() < 0.8:
         op = random.choice(list(BINARY_OPERATORS.keys()))
         arity = 2

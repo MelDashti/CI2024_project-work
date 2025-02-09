@@ -6,17 +6,6 @@ def load_dataset(filepath, test_split=0.2):
     data = np.load(filepath)
     x = data['x']  # shape (n_features, n_samples)
     y = data['y']  # shape (n_samples,)
-
-    # # Normalize features along each row (feature)
-    # x_mean = np.mean(x, axis=1, keepdims=True)
-    # x_std = np.std(x, axis=1, keepdims=True) + 1e-10  # avoid div by zero
-    # x = (x - x_mean) / x_std
-
-    # # Optionally, normalize targets if the scale is very large:
-    # y_mean = np.mean(y)
-    # y_std = np.std(y) + 1e-10
-    # y = (y - y_mean) / y_std
-
     n_samples = y.shape[0]
     n_test = int(n_samples * test_split)
     indices = np.arange(n_samples)
