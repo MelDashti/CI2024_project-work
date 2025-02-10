@@ -1172,29 +1172,64 @@ So after all that work tuning parameters on datasets 2 and 7 (which were pretty 
 While datasets 2 and 7 needed to run for the full 180 generations to get good mse values, the others were finding good solutions way faster - usually somewhere between 20-50 generations. This was great because it meant:
 
 The formulas came out simpler and easier to read, everything ran faster. Also, the early stopping feature I added actually came in handy, stopping the run when it wasn't getting better anymore. However, since I started from complex dataset I was observing a new issue when testing the simpler dataset like 0 and 1 where for both I was getting the same value [x0] as the final formula we will in the next section more about this.
-
-## Additional Observations: Effect of Parsimony on Formula Complexity  
-
-While fine-tuning hyperparameters, I noticed that the GP system **kept converging to overly simple formulas** like `x[0]`, even when the true function contained additional terms like `sin(x[1]/5)`. Initially, I assumed this was due to operator selection or tree depth constraints, but after further testing, I found the real issue: **the parsimony coefficient**.
-
-#### **Parsimony and Its Impact**
+### **Parsimony and Its Impact**
 Parsimony is used to prevent bloated expressions by penalizing larger trees in the fitness function. However, **it unintentionally suppressed necessary complexity**, making the system favor simpler formulas like `x[0]`, even when slightly more complex ones fit the data much better.
 
-#### **Fix: Removing Parsimony Pressure**
+### **Fix: Removing Parsimony Pressure**
 For **Datasets 0 and 1**, I set the **parsimony coefficient to 0**, completely removing the size penalty from the fitness function. This allowed the GP to evolve more expressive formulas without immediately discarding non-trivial structures.
 
-#### **Results After Removing Parsimony**
+### **Results After Removing Parsimony**
 With **parsimony disabled**, the GP system was finally able to evolve formulas closer to the expected function:
 
+After applying these refinements, the system finally evolved **accurate expressions** rather than defaulting to `x[0]`. The best formulas started to resemble:
 
-After applying these refinements, the system finally evolved **accurate expressions** rather than defaulting to `x[0]`. The best formulas started to resemble:  
-
+\[
 f(x) = x[0] + \frac{\sin(x[1])}{5}
-and sin[x0]
+\]
 
-So based on different datasets I had to make different changes. Parsimony coefficient is needed for the more complex dataset in order to achieve a lower mse. 
+and
 
-## Lecture Notes: Early Class Highlights
+\[
+\sin[x0]
+\]
+
+### **Parsimony for Complex Datasets**
+- **For simpler datasets**, **removing parsimony** led to better results, allowing more expressive formulas to emerge.
+- **For more complex datasets**, **parsimony was crucial** to prevent extreme formula length, which increased interpretability without significantly increasing MSE.
+
+---
+
+### **Effect of Generations and Parsimony Across Datasets**
+| Dataset | Best Parsimony | Best Generations | Best MSE | Formula Length |
+| --- | --- | --- | --- | --- |
+| 3 | 0.000 | 100 | 1.005 | Short |
+| 4 | 0.005 | 180 | 0.002 | Long |
+| 5 | 0.005 | 17 (early stop) | 0.005 | Simple |
+| 6 | 0.0 | 10 (early stop) | 0.265 | Moderate |
+| 7 | 0.005 | 180 | 36.98 → **Used 130 MSE formula** | **Extremely long, unusable** |
+| 8 | 0 | 60 | 714527 | Complex |
+
+---
+There were times when the formulas got very complex even though I used parsimony and sympy, so I decided to use simpler formulas with a bit higher mse. One example is the following.
+
+### **Formula Complexity Tradeoff in Dataset 7**
+During my experiments with Dataset 7, I observed that:
+- The best **MSE (36.98) after 180 generations** produced a **formula so complex** that **SymPy couldn't simplify it** and it was **impossible to use** in a practical implementation.
+- Instead, I had to **settle for a slightly worse formula (~130 MSE)** that was still interpretable and usable in my pipeline.
+
+This confirmed my earlier findings from **Dataset 2**, where increasing generations consistently **reduced MSE but at the cost of formula complexity**.
+
+---
+
+### **Key Takeaways**
+- **Parsimony is dataset-dependent**—useful for complex cases but restrictive for simple datasets.
+- **Higher generations lead to lower MSE but excessively long formulas**.
+- **Finding the right balance between formula complexity and accuracy is crucial**.
+- **For Dataset 7, the lowest MSE formula was practically unusable, forcing me to use a simpler alternative.**
+
+## **Lecture Notes: Early Class Highlights**
+These notes were taken while watching the lectures, but since they were **scattered and unorganized**, I used ChatGPT to **summarize and structure them** in a more **coherent and tidy** format.
+
 
 #### Modeling
 1. **Terminology**:
