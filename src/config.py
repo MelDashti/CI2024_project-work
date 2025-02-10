@@ -3,7 +3,7 @@ POPULATION_SIZE = 300
 MAX_GENERATIONS = 180
 TOURNAMENT_SIZE = 8
 ELITISM_COUNT = 3
-
+PARSIMONY_COEFF = 0.0
 # Tree constraints
 MAX_DEPTH = 4  # Reduced for smaller trees
 MIN_DEPTH = 2
@@ -17,4 +17,4 @@ PATIENCE = 7  # Number of generations without improvement before stopping
 MIN_FITNESS_IMPROVEMENT = 1e-7  # Minimum improvement for it to count
 
 # Data
-TRAIN_DATA_PATH = "data/problem_2.npz"
+TRAIN_DATA_PATH = "data/problem_1.npz"

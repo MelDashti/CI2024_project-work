@@ -5,11 +5,11 @@ from node import Node
 from utils import mean_squared_error
 from config import (
     POPULATION_SIZE, MAX_DEPTH, MIN_DEPTH, MUTATION_RATE, 
-    CROSSOVER_RATE, TOURNAMENT_SIZE, ELITISM_COUNT
+    CROSSOVER_RATE, TOURNAMENT_SIZE, ELITISM_COUNT, PARSIMONY_COEFF
 )
 
 # Increase parsimony coefficient to further discourage bloated trees
-PARSIMONY_COEFF = 0.007
+
 
 def initialize_population(variables_count):
     population = []
